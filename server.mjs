@@ -150,13 +150,31 @@ function runRea(command, cliArgs) {
 
 // —— MCP stdio 主循环 ——
 const rl = createInterface({ input: process.stdin, terminal: false });
-const send = (msg) => { process.stdout.write(JSON.stringify(msg) + '\n'); };
+const send = (msg) => {
+  try { process.stdout.write(JSON.stringify(msg) + '\n'); }
+  catch (e) { /* 同步写失败（罕见）：无法回信，忽略以免连锁 */ void e; }
+};
+
+// 2026-10-10 加固（与 akasha core/mcp.mjs 同族）：客户端先退 ⇒ 写 stdout 会以**异步 'error' 事件**抛 EPIPE，
+// 未挂处理即未捕获异常 → 整条 REA 桥死。标准流挂 error → 安静退出；stdin 关 → 收尾。
+for (const stream of [process.stdout, process.stderr]) stream.on('error', () => process.exit(0));
+process.stdin.on('error', () => process.exit(0));
+rl.on('close', () => process.exit(0));
 
 rl.on('line', async (line) => {
   const text = line.trim();
   if (!text) return;
   let req;
-  try { req = JSON.parse(text); } catch { return; }
+  try { req = JSON.parse(text); } catch {
+    send({ jsonrpc: '2.0', id: null, error: { code: -32700, message: '解析失败：不是合法 JSON' } });
+    return;
+  }
+  // 2026-10-10 加固：形状校验必须在**解构之前**——合法 JSON 但形状不对（null/数字/字符串/数组/缺 method）
+  // 时回 JSON-RPC 错误，而不是解构抛错（在 async handler 里会变成未处理拒绝，直接终结进程）。
+  if (req === null || typeof req !== 'object' || Array.isArray(req) || typeof req.method !== 'string') {
+    send({ jsonrpc: '2.0', id: (req && typeof req === 'object' && 'id' in req) ? req.id : null, error: { code: -32600, message: '无效的 JSON-RPC 请求（需要含 method 的对象）' } });
+    return;
+  }
   const { id, method, params } = req;
   try {
     if (method === 'initialize') {
