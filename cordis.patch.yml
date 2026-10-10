@@ -1,0 +1,12 @@
+- insert:
+    - id: mcp-rea
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: rea
+        transport: stdio
+        # command 用 'node'（PATH 解析）或 node 可执行文件绝对路径；
+        # args 改成你机器上 server.mjs 的绝对路径（Windows 例：C:\\tools\\dsh-mcp-rea\\server.mjs）
+        command: 'node'
+        args: ['/path/to/dsh-mcp-rea/server.mjs']
+        failOnStartupError: false
+        maxInstructionBytes: 2048

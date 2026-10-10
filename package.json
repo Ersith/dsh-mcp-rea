@@ -1,0 +1,14 @@
+{
+  "name": "@local/mcp-rea",
+  "version": "0.1.2",
+  "private": true,
+  "engines": { "node": ">=22.15.0" },
+  "type": "module",
+  "description": "REA 逆向工程 CLI 的 MCP 桥（精选 10 工具 + CLI 逃生舱；避免原生 139 工具/1.8MB schema 撑爆 prefill）",
+  "files": ["cordis.patch.yml", "server.mjs", "selftest.mjs", "README.md"],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}
