@@ -1,5 +1,7 @@
 # dsh-mcp-rea —— REA 的 MCP 薄壳桥
 
+[![Featured by Awesome REA](https://raw.githubusercontent.com/reacher-z/Awesome-REA/477658fa73f6860e86cd1fc526657c2efdc25194/assets/featured-by-awesome-rea-inline.svg)](https://awesomerea.org/resources/dsh-mcp-rea/)
+
 把 **REA**（逆向工程 CLI）以 **「精选工具面 + CLI 逃生舱」** 暴露为 MCP stdio 服务器，供 DSH（DeepSeek Harness）等支持 MCP 的宿主使用。
 
 > 包名 `@local/mcp-rea` 是 DSH 本机 bundle 的命名约定；`private: true`，**不发布到 npm**，以仓库 / tgz 形式本机安装。
